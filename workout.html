@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+        }
+        .container {
+            max-width: 1000px;
+        }
+        .card {
+            background-color: #1E1E1E;
+            border: 1px solid #333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn:hover {
+            background-color: #4CAF50;
+        }
+        input[type="number"] {
+            background-color: #2D2D2D;
+            border: 1px solid #444;
+            color: #E0E0E0;
+        }
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="container mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-green-500 mb-2">Workout Tracker</h1>
+            <p class="text-lg text-gray-400">Track your progress and stay consistent with your routine.</p>
+        </header>
+
+        <!-- Week Selector -->
+        <div class="mb-8 flex flex-col sm:flex-row items-center justify-center">
+            <label for="week-select" class="text-lg font-medium mr-4">Select Week:</label>
+            <select id="week-select" class="bg-gray-700 text-white rounded-md p-2 focus:ring-2 focus:ring-green-500 w-full sm:w-auto mt-2 sm:mt-0">
+            </select>
+        </div>
+
+        <!-- Workout Schedule -->
+        <div id="workout-schedule" class="grid gap-6">
+            <!-- Content will be dynamically generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Data for all 12 weeks of the workout plan
+        const workoutData = [
+            // Week 1
+            {
+                week: 1,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 2
+            {
+                week: 2,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "10-10-10-12-12", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "20", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "20", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "10-10-10-12-12", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "12", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "10-10-10-12-12", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "20", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "20", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "10-10-10-12-12", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 3
+            {
+                week: 3,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "8-8-8-10-10", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "8-8-8-10-10", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "10", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "8-8-8-10-10", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "8-8-8-10-10", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 4
+            {
+                week: 4,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "6-6-6-8-8", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "10", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "10", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "6-6-6-8-8", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "6-6-6-8-8", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "6-6-6-8-8", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Leg Raise (add weight for 8RM)", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 5
+            {
+                week: 5,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Upright Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 6
+            {
+                week: 6,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Upright Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "5-5-5-5-5", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 7
+            {
+                week: 7,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 8
+            {
+                week: 8,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Upright Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "3-3-3-3-3", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise (add weight for 8RM)", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 9
+            {
+                week: 9,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 10
+            {
+                week: 10,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "8", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "3-3-3-1-1", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "6", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "8", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 11
+            {
+                week: 11,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+            // Week 12
+            {
+                week: 12,
+                days: [
+                    { day: "Day 1: Chest, Triceps, Calf", exercises: [
+                        { name: "Bench Press (Barbell)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Incline Dumbbell Bench Press", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Dumbbell Fly (Flat)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Triceps Rope Pressdown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Skull Crusher with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 2: Back, Biceps, Abs", exercises: [
+                        { name: "Pendlay Row", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Lat Pulldown", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Lat Pullover with Cable", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Cable Row", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Preacher Curl with Dumbbell", sets: 3, reps: "15", resting: "90 sec" },
+                    ]},
+                    { day: "Day 3: Rest", exercises: [] },
+                    { day: "Day 4: Delts, Traps, Calf", exercises: [
+                        { name: "Military Press (OHP)", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Dumbbell Lateral Raise", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Rear Delt Fly", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Up-right Row with Barbell", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Barbell Shrug", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Standing Calf Raise", sets: 3, reps: "25", resting: "90 sec" },
+                        { name: "Seated Calf Raise (or in Calfpress Legpress Machine)", sets: 3, reps: "25", resting: "90 sec" },
+                    ]},
+                    { day: "Day 5: Legs, Abs", exercises: [
+                        { name: "Squat", sets: 5, reps: "12-12-12-15-15", resting: "90 sec" },
+                        { name: "Legpress Machine", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Extension", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Stiffleg Deadlift (or Romanian DL)", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Curl", sets: 3, reps: "15", resting: "90 sec" },
+                        { name: "Leg Raise", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Crunch Machine", sets: 3, reps: "12", resting: "90 sec" },
+                        { name: "Plank", sets: 2, reps: "1 Minute", resting: "60 sec" },
+                    ]},
+                    { day: "Day 6 and Day 7: Rest", exercises: [] }
+                ]
+            },
+        ];
+
+        // Get elements
+        const weekSelect = document.getElementById('week-select');
+        const workoutSchedule = document.getElementById('workout-schedule');
+
+        // Populate the week selector dropdown
+        workoutData.forEach(week => {
+            const option = document.createElement('option');
+            option.value = week.week;
+            option.textContent = `Week ${week.week}`;
+            weekSelect.appendChild(option);
+        });
+
+        // Function to render the workout schedule for a given week
+        function renderWeek(weekNumber) {
+            workoutSchedule.innerHTML = '';
+            const selectedWeek = workoutData.find(w => w.week === weekNumber);
+
+            if (selectedWeek) {
+                selectedWeek.days.forEach(day => {
+                    const dayCard = document.createElement('div');
+                    dayCard.className = 'card rounded-lg p-6 mb-4';
+
+                    const dayTitle = document.createElement('h2');
+                    dayTitle.className = 'text-2xl font-semibold mb-4 text-green-400';
+                    dayTitle.textContent = day.day;
+                    dayCard.appendChild(dayTitle);
+
+                    if (day.exercises.length > 0) {
+                        const table = document.createElement('table');
+                        table.className = 'w-full text-left border-collapse';
+                        
+                        // Table header
+                        const tableHeader = `
+                            <thead>
+                                <tr class="border-b border-gray-600">
+                                    <th class="py-2 px-4 font-bold text-gray-400">Exercise</th>
+                                    <th class="py-2 px-4 font-bold text-gray-400">Sets</th>
+                                    <th class="py-2 px-4 font-bold text-gray-400">Reps</th>
+                                    <th class="py-2 px-4 font-bold text-gray-400">Rest</th>
+                                    <th class="py-2 px-4 font-bold text-gray-400">Weight (kg)</th>
+                                </tr>
+                            </thead>
+                        `;
+                        table.innerHTML += tableHeader;
+                        
+                        const tableBody = document.createElement('tbody');
+                        day.exercises.forEach(exercise => {
+                            const row = document.createElement('tr');
+                            row.className = 'border-b border-gray-700';
+                            row.innerHTML = `
+                                <td class="py-3 px-4">${exercise.name}</td>
+                                <td class="py-3 px-4">${exercise.sets}</td>
+                                <td class="py-3 px-4">${exercise.reps}</td>
+                                <td class="py-3 px-4">${exercise.resting}</td>
+                                <td class="py-3 px-4">
+                                    <input type="number" class="w-24 p-1 rounded-md text-sm" placeholder="Enter weight">
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        table.appendChild(tableBody);
+                        dayCard.appendChild(table);
+                    } else {
+                        const message = document.createElement('p');
+                        message.className = 'text-gray-400';
+                        message.textContent = "Enjoy your rest day!";
+                        dayCard.appendChild(message);
+                    }
+
+                    workoutSchedule.appendChild(dayCard);
+                });
+            } else {
+                workoutSchedule.innerHTML = '<p class="text-center text-gray-400">Workout data not found for this week.</p>';
+            }
+        }
+
+        // Event listener for week selector
+        weekSelect.addEventListener('change', (e) => {
+            renderWeek(parseInt(e.target.value));
+        });
+
+        // Initial render for Week 1
+        window.onload = () => {
+            renderWeek(1);
+        };
+    </script>
+</body>
+</html>
